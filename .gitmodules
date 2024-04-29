@@ -1,0 +1,3 @@
+[submodule "LineBreakTool/Vendor/imgui"]
+	path = LineBreakTool/Vendor/imgui
+	url = https://github.com/ocornut/imgui.git
