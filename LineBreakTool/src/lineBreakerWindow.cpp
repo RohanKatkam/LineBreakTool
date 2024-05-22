@@ -10,8 +10,9 @@ namespace window
     bool isConvertButtonClicked = false;
     char defaultOutputText[MAX_STD_STRING_LENGTH] = "Output text is here";
     static std::string entryText;
-    char outputText[MAX_OUTPUT_TEXT_LEN] = "Default Output hasi";
+    static char outputText[MAX_OUTPUT_TEXT_LEN] = "Default Output has'dsf'";
 
+    static bool isIgnoredMultipleLineBreak = false;
     static void removeLineBreak(std::string entryText, char* filteredText)
     {
         // Read every character
@@ -25,7 +26,27 @@ namespace window
             }
             else
             {
-                filteredText[outputIdx++] = ' ';
+                if (i - 1 < 0) continue;
+                if ((i + 1) >= entryText.length()) break;
+                char previousChar = entryText[i - 1];
+                char nextChar = entryText[i + 1];
+
+                if (!isIgnoredMultipleLineBreak)
+                {
+                    if (nextChar == '\n')
+                    {
+                        filteredText[outputIdx++] = '\n';
+                        continue;
+                    }
+                }
+                
+                if (! (previousChar == '-' || previousChar == ' ' || nextChar == ' ' || previousChar == '\n'))
+                {
+                    filteredText[outputIdx++] = ' ';
+                }
+
+                // Multiline ignore feature
+                
             }
         }
         filteredText[outputIdx] = '\0';
@@ -33,7 +54,8 @@ namespace window
 
     static void resetOutputText(char* outputText)
     {
-        outputText = defaultOutputText;
+        for (int i = 0; i < MAX_OUTPUT_TEXT_LEN; i++)
+            outputText[i] = defaultOutputText[i];
     }
 
     void generateWindow(void)
@@ -44,9 +66,11 @@ namespace window
         // Input Textbox 
         ImGui::Text("Welcome to the tool application, where unncessary line breaks are broken at ease, please add your input text to the textbox below");
         ImGui::SeparatorText("Input");
+
+        ImGui::Checkbox("Ignore multiple line Breaks?", &isIgnoredMultipleLineBreak);
         //ImGui::InputText("Input Text", &entryText);
 
-        ImGui::InputTextMultiline("Input Text", &entryText, ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * TEXT_BOX_HEIGHT));
+        ImGui::InputTextMultiline("Input 'Text", &entryText, ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * TEXT_BOX_HEIGHT));
 
         // Convert Button
         if (ImGui::Button("Convert Text"))
@@ -65,7 +89,10 @@ namespace window
         ImGui::TextWrapped(outputText);
 
         // Copy Button
-        bool isCopyButtonClicked = ImGui::Button("Copy Output");
+        static bool isCopyButtonClicked = false;
+
+        if (ImGui::Button("Copy Output"))
+            isCopyButtonClicked = true;
 
         // Copy logic?!
         if (isCopyButtonClicked)
@@ -84,10 +111,12 @@ namespace window
         if (isIOButtonClicked)
         {
             // Reset input to blank
-            entryText = " ";
+            entryText = "";
 
             // Reset output text to default text
             resetOutputText(outputText);
+
+            isCopyButtonClicked = false;
         }
 
         // End window

@@ -14,12 +14,12 @@
 
 namespace window
 {
-	// Desp:
+	// Removes the line break
 	static void removeLineBreak(std::string entryText, char* outputText);
 
-	// Desp:
+	// Clears and resets the output text
 	static void resetOutputText(char* outputText);
 
-	// Desp: 
+	// Creates a window instance
 	void generateWindow(void);
 }
